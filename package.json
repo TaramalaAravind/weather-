@@ -1,15 +1,19 @@
 {
-  "name": "weather-app",
+  "name": "weather-condition-app",
   "version": "1.0.0",
-  "description": "A modern, responsive weather application that provides real-time weather information for any location worldwide.",
-  "main": "index.html",
+  "description": "A modern, responsive weather condition application that provides real-time weather information including wind direction for any location worldwide.",
+  "main": "weather-app.html",
   "scripts": {
     "start": "python -m http.server 8000",
     "dev": "python -m http.server 8000",
-    "serve": "python -m http.server 8000"
+    "serve": "python -m http.server 8000",
+    "build": "echo 'Static site - no build required'",
+    "deploy": "vercel --prod"
   },
   "keywords": [
     "weather",
+    "weather-condition",
+    "wind-direction",
     "api",
     "openweathermap",
     "javascript",
@@ -18,16 +22,16 @@
     "responsive",
     "vercel"
   ],
-  "author": "Weather App Developer",
+  "author": "taramalaAravind",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/weather-app.git"
+    "url": "https://github.com/taramalaAravind/weather-condition-app.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/weather-app/issues"
+    "url": "https://github.com/taramalaAravind/weather-condition-app/issues"
   },
-  "homepage": "https://yourusername.github.io/weather-app",
+  "homepage": "https://weather-condition-app.vercel.app",
   "engines": {
     "node": ">=14.0.0"
   },

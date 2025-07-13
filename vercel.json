@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "name": "weather-condition-app",
   "builds": [
     {
       "src": "weather-app.html",
@@ -7,6 +8,10 @@
     }
   ],
   "routes": [
+    {
+      "src": "/",
+      "dest": "/weather-app.html"
+    },
     {
       "src": "/(.*)",
       "dest": "/weather-app.html"
@@ -31,8 +36,14 @@
         {
           "key": "Referrer-Policy",
           "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600"
         }
       ]
     }
-  ]
+  ],
+  "functions": {},
+  "env": {}
 } 
