@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Real-time weather information for any location worldwide. Get current temperature, humidity, wind speed, and more.">
+    <meta name="keywords" content="weather, temperature, forecast, humidity, wind">
+    <meta name="author" content="Weather App">
+    <meta name="robots" content="index, follow">
+    <title>🌤️ Weather App - Real-time Weather Information</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌤️</text></svg>">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            transition: background 0.5s ease;
+        }
+        
+        body.clear-sky {
+            background: linear-gradient(135deg, #87CEEB 0%, #98D8E8 100%);
+        }
+        
+        body.cloudy {
+            background: linear-gradient(135deg, #B0C4DE 0%, #D3D3D3 100%);
+        }
+        
+        body.rainy {
+            background: linear-gradient(135deg, #4682B4 0%, #708090 100%);
+        }
+        
+        body.snowy {
+            background: linear-gradient(135deg, #F0F8FF 0%, #E6E6FA 100%);
+        }
+        
+        body.stormy {
+            background: linear-gradient(135deg, #2F4F4F 0%, #696969 100%);
+        }
+        
+        .container {
+            max-width: 450px;
+            margin: 20px auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2563eb;
+            margin-bottom: 25px;
+            font-size: 2.2rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .search-section {
+            margin-bottom: 25px;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        input[type="text"] {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        button {
+            background: #2563eb;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            padding: 12px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        
+        button:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+        
+        button:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .unit-toggle {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .unit-btn {
+            background: #f8fafc;
+            color: #64748b;
+            border: 2px solid #e2e8f0;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        
+        .unit-btn.active {
+            background: #2563eb;
+            color: #fff;
+            border-color: #2563eb;
+        }
+        
+        .weather-card {
+            text-align: center;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+        
+        .location {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+        
+        .weather-icon {
+            width: 100px;
+            height: 100px;
+            margin: 15px auto;
+            display: block;
+        }
+        
+        .temperature {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: #2563eb;
+            margin: 10px 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .description {
+            font-size: 1.2rem;
+            color: #64748b;
+            margin-bottom: 20px;
+            text-transform: capitalize;
+        }
+        
+        .weather-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .detail-item {
+            background: rgba(255, 255, 255, 0.6);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .detail-label {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-bottom: 5px;
+        }
+        
+        .detail-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        
+        .error {
+            background: #fef2f2;
+            color: #dc2626;
+            text-align: center;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid #fecaca;
+            margin-top: 20px;
+            font-weight: 500;
+        }
+        
+        .loading {
+            text-align: center;
+            color: #64748b;
+            font-style: italic;
+            padding: 20px;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #2563eb;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .additional-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .api-key-form {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 20px;
+        }
+        
+        .api-key-form h3 {
+            color: #1e293b;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .api-key-form p {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+        
+        .api-key-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+        
+        .api-key-input:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+        
+        @media (max-width: 500px) {
+            .container {
+                margin: 10px;
+                padding: 20px;
+            }
+            
+            .weather-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .temperature {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌤️ Weather</h1>
+        
+        <div id="api-key-section" class="api-key-form" style="display: none;">
+            <h3>🔑 API Key Required</h3>
+            <p>To use this weather app, you need an OpenWeatherMap API key. Get a free key at <a href="https://openweathermap.org/api" target="_blank" style="color: #2563eb;">OpenWeatherMap</a>.</p>
+            <input type="text" id="api-key-input" class="api-key-input" placeholder="Enter your OpenWeatherMap API key..." />
+            <button type="button" id="save-api-key-btn">Save API Key</button>
+        </div>
+        
+        <div class="search-section" id="search-section" style="display: none;">
+            <div class="input-group">
+                <input type="text" id="location-input" placeholder="Enter city, state, or village name..." required>
+                <button type="button" id="search-btn">Search</button>
+            </div>
+            
+            <div class="unit-toggle">
+                <button class="unit-btn active" data-unit="metric">°C</button>
+                <button class="unit-btn" data-unit="imperial">°F</button>
+            </div>
+        </div>
+        
+        <div id="weather-result"></div>
+        <div id="error-message"></div>
+        
+        <div style="margin-top:20px; font-size:0.85em; color:#64748b; text-align:center;">
+            Powered by <a href="https://openweathermap.org" target="_blank" style="color:#2563eb;">OpenWeatherMap</a>
+        </div>
+    </div>
+
+    <script>
+        // DOM elements
+        const apiKeySection = document.getElementById('api-key-section');
+        const searchSection = document.getElementById('search-section');
+        const apiKeyInput = document.getElementById('api-key-input');
+        const saveApiKeyBtn = document.getElementById('save-api-key-btn');
+        const locationInput = document.getElementById('location-input');
+        const searchBtn = document.getElementById('search-btn');
+        const weatherResult = document.getElementById('weather-result');
+        const errorMessage = document.getElementById('error-message');
+        const unitBtns = document.querySelectorAll('.unit-btn');
+        
+        // State variables
+        let currentUnit = localStorage.getItem('weather_unit') || 'metric';
+        let lastLocation = localStorage.getItem('last_location') || '';
+        let apiKey = localStorage.getItem('weather_api_key') || '';
+        
+        // Initialize app
+        function initializeApp() {
+            if (!apiKey) {
+                apiKeySection.style.display = 'block';
+                searchSection.style.display = 'none';
+            } else {
+                apiKeySection.style.display = 'none';
+                searchSection.style.display = 'block';
+                
+                // Set initial unit button state
+                document.querySelector(`[data-unit="${currentUnit}"]`).classList.add('active');
+                
+                // Load last location if available
+                if (lastLocation) {
+                    locationInput.value = lastLocation;
+                    fetchWeather(lastLocation);
+                }
+            }
+        }
+        
+        // Event listeners
+        saveApiKeyBtn.addEventListener('click', () => {
+            const key = apiKeyInput.value.trim();
+            if (key) {
+                apiKey = key;
+                localStorage.setItem('weather_api_key', apiKey);
+                apiKeySection.style.display = 'none';
+                searchSection.style.display = 'block';
+                initializeApp();
+            }
+        });
+        
+        apiKeyInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                saveApiKeyBtn.click();
+            }
+        });
+        
+        searchBtn.addEventListener('click', () => {
+            const location = locationInput.value.trim();
+            if (location) {
+                fetchWeather(location);
+            }
+        });
+        
+        locationInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const location = locationInput.value.trim();
+                if (location) {
+                    fetchWeather(location);
+                }
+            }
+        });
+        
+        unitBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                unitBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentUnit = btn.dataset.unit;
+                localStorage.setItem('weather_unit', currentUnit);
+                
+                if (lastLocation) {
+                    fetchWeather(lastLocation);
+                }
+            });
+        });
+        
+        function setWeatherBackground(weatherMain) {
+            document.body.className = '';
+            
+            if (weatherMain.includes('Clear')) {
+                document.body.classList.add('clear-sky');
+            } else if (weatherMain.includes('Cloud')) {
+                document.body.classList.add('cloudy');
+            } else if (weatherMain.includes('Rain') || weatherMain.includes('Drizzle')) {
+                document.body.classList.add('rainy');
+            } else if (weatherMain.includes('Snow')) {
+                document.body.classList.add('snowy');
+            } else if (weatherMain.includes('Thunderstorm')) {
+                document.body.classList.add('stormy');
+            }
+        }
+        
+        async function fetchWeather(location) {
+            if (!apiKey) {
+                errorMessage.innerHTML = '<div class="error">❌ API key not found. Please enter your OpenWeatherMap API key.</div>';
+                return;
+            }
+            
+            weatherResult.innerHTML = '<div class="loading"><span class="spinner"></span>Loading weather data...</div>';
+            errorMessage.innerHTML = '';
+            searchBtn.disabled = true;
+            
+            try {
+                const response = await fetch(
+                    `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(location)}&appid=${apiKey}&units=${currentUnit}`
+                );
+                
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        throw new Error('Invalid API key. Please check your OpenWeatherMap API key.');
+                    } else if (response.status === 404) {
+                        throw new Error('Location not found. Please check the spelling and try again.');
+                    } else if (response.status === 429) {
+                        throw new Error('API rate limit exceeded. Please try again later.');
+                    } else {
+                        throw new Error(`Error ${response.status}: ${response.statusText}`);
+                    }
+                }
+                
+                const data = await response.json();
+                displayWeather(data);
+                setWeatherBackground(data.weather[0].main);
+                localStorage.setItem('last_location', location);
+                lastLocation = location;
+                
+            } catch (error) {
+                errorMessage.innerHTML = `<div class="error">❌ ${error.message}</div>`;
+                weatherResult.innerHTML = '';
+            } finally {
+                searchBtn.disabled = false;
+            }
+        }
+        
+        function displayWeather(data) {
+            const temp = data.main.temp;
+            const feelsLike = data.main.feels_like;
+            const humidity = data.main.humidity;
+            const pressure = data.main.pressure;
+            const windSpeed = data.wind.speed;
+            const windDeg = data.wind.deg;
+            const visibility = data.visibility;
+            const description = data.weather[0].description;
+            const icon = data.weather[0].icon;
+            const locationName = data.name;
+            const country = data.sys.country;
+            const sunrise = new Date(data.sys.sunrise * 1000);
+            const sunset = new Date(data.sys.sunset * 1000);
+            
+            const tempUnit = currentUnit === 'metric' ? '°C' : '°F';
+            const windUnit = currentUnit === 'metric' ? 'km/h' : 'mph';
+            const windDisplay = currentUnit === 'metric' ? (windSpeed * 3.6).toFixed(1) : windSpeed.toFixed(1);
+            
+            const windDirection = getWindDirection(windDeg);
+            
+            weatherResult.innerHTML = `
+                <div class="weather-card">
+                    <div class="location">📍 ${locationName}, ${country}</div>
+                    <img class="weather-icon" src="https://openweathermap.org/img/wn/${icon}@2x.png" alt="Weather icon" loading="lazy">
+                    <div class="temperature">${temp.toFixed(1)}${tempUnit}</div>
+                    <div class="description">${description}</div>
+                    
+                    <div class="weather-details">
+                        <div class="detail-item">
+                            <div class="detail-label">Feels Like</div>
+                            <div class="detail-value">${feelsLike.toFixed(1)}${tempUnit}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Humidity</div>
+                            <div class="detail-value">${humidity}%</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Wind Speed</div>
+                            <div class="detail-value">${windDisplay} ${windUnit}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Wind Direction</div>
+                            <div class="detail-value">${windDirection}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="additional-info">
+                        <div class="info-grid">
+                            <div>
+                                <div class="detail-label">Pressure</div>
+                                <div class="detail-value">${pressure} hPa</div>
+                            </div>
+                            <div>
+                                <div class="detail-label">Visibility</div>
+                                <div class="detail-value">${(visibility / 1000).toFixed(1)} km</div>
+                            </div>
+                            <div>
+                                <div class="detail-label">Sunrise</div>
+                                <div class="detail-value">${sunrise.toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'})}</div>
+                            </div>
+                            <div>
+                                <div class="detail-label">Sunset</div>
+                                <div class="detail-value">${sunset.toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'})}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function getWindDirection(degrees) {
+            const directions = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
+            const index = Math.round(degrees / 22.5) % 16;
+            return directions[index];
+        }
+        
+        // Initialize the app
+        initializeApp();
+    </script>
+</body>
+</html> 
